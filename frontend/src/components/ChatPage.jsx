@@ -9,6 +9,7 @@ import ChatBox from "./chat/ChatBox";
 
 const ChatPage = () => {
   const dispatch = useDispatch();
+  const [fetchAgain, setFetchAgain] = useState(false);
 
   const {
     user: { user, token },
@@ -30,8 +31,10 @@ const ChatPage = () => {
         h="91.5vh"
         p={"10px"}
       >
-        {user && <MyChats />}
-        {user && <ChatBox />}
+        {user && <MyChats fetchAgain={fetchAgain} />}
+        {user && (
+          <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+        )}
       </Box>
     </div>
   );

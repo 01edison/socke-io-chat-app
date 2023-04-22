@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const userSlice = createSlice({
   name: "user",
-  initialState: { user: {}, currentChat: {}, chats: [] },
+  initialState: { user: {}, currentChat: "", chats: [] },
   reducers: {
     setUser(state, action) {
       const userInfo = action.payload;

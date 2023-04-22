@@ -12,7 +12,12 @@ const { requireSignIn } = require("./middlewares/auth");
 const { login, register } = require("./controllers/auth");
 const { allUsers, getUserImage } = require("./controllers/user");
 const { createChat, fetchAllChats } = require("./controllers/chat");
-const { createGroupChat, renameGroupChat, addToGroup, removeFromGroup } = require("./controllers/groupChat");
+const {
+  createGroupChat,
+  renameGroupChat,
+  addToGroup,
+  removeFromGroup,
+} = require("./controllers/groupChat");
 
 require("dotenv").config();
 
@@ -28,8 +33,9 @@ app.post("/api/login", login);
 app.post("/api/register", register);
 
 //user
-app.route("/api/user").get(requireSignIn, allUsers);
-app.get("/api/user/image/:id", getUserImage)
+app.get("/api/user", requireSignIn, allUsers);
+app.get("/api/user/image/:id", getUserImage);
+
 //chat
 app
   .route("/api/chat")
@@ -42,7 +48,9 @@ app
   .post(requireSignIn, createGroupChat)
   .put(requireSignIn, addToGroup)
   .patch(requireSignIn, renameGroupChat)
-  .delete(requireSignIn, removeFromGroup)
+
+app.post("/api/group/remove", requireSignIn, removeFromGroup)
+
 
 app.listen(process.env.PORT, () => {
   console.log("server started on port 4000");

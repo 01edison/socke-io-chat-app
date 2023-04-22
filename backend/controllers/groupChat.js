@@ -13,15 +13,13 @@ const createGroupChat = async (req, res) => {
       throw new Error("Admin cannot be part of the list");
     }
 
-    const usersArr = JSON.parse(users);
-
-    usersArr.push(req.user);
+    users.push(req.user._id);
 
     try {
       const groupChat = new Chat({
         chatName,
         isGroupChat: true,
-        users: usersArr,
+        users,
         groupAdmin: req.user._id,
       });
 
@@ -56,7 +54,9 @@ const renameGroupChat = async (req, res) => {
           { _id: chatId },
           { chatName },
           { new: true }
-        );
+        )
+          .populate("users", "-picture -password")
+          .populate("groupAdmin", "-picture -password");
         return res.send(updatedGroupChat);
       } catch (err) {
         return res.status(400).json({ err });
@@ -100,10 +100,10 @@ const removeFromGroup = async (req, res) => {
   try {
     const { chatId, userId } = req.body;
 
-    const groupChat = await Chat.findOne({ _id: chatId });
+    const chat = await Chat.findOne({ _id: chatId });
 
-    if (groupChat.isGroupChat) {
-      if (groupChat.users.includes(userId)) {
+    if (chat.isGroupChat) {
+      if (chat.users.includes(userId)) {
         const updatedGroupChat = await Chat.findOneAndUpdate(
           { _id: chatId },
           { $pull: { users: userId } },

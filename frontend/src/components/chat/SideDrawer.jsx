@@ -47,7 +47,7 @@ const SideDrawer = ({ user, token }) => {
     localStorage.removeItem("user");
     dispatch(userActions.setChats([]));
     dispatch(userActions.setUser({}));
-    dispatch(userActions.setCurrentChat({}));
+    dispatch(userActions.setCurrentChat(""));
     navigate("/");
   };
 

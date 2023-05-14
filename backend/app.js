@@ -18,6 +18,7 @@ const {
   addToGroup,
   removeFromGroup,
 } = require("./controllers/groupChat");
+const { sendMessage, allMessages } = require("./controllers/messages");
 
 require("dotenv").config();
 
@@ -51,6 +52,9 @@ app
 
 app.post("/api/group/remove", requireSignIn, removeFromGroup)
 
+// messages
+app.post("/api/messages", requireSignIn, sendMessage)
+app.get("/api/messages/:chatId", requireSignIn, allMessages)
 
 app.listen(process.env.PORT, () => {
   console.log("server started on port 4000");

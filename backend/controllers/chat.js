@@ -13,7 +13,7 @@ const createChat = async (req, res) => {
 
     const chatMate = await User.findById(userId);
 
-    let chat = await Chat.find({
+    let chats = await Chat.find({
       isGroupChat: false,
       $and: [
         //each chat has a "users" array field containing the ids of the 2 people chatting
@@ -23,10 +23,17 @@ const createChat = async (req, res) => {
       ],
     })
       .populate("users", "-password")
+      .populate({
+        path: "latestMessage",
+        populate: {
+          path: "sender",
+          select: "name",
+        },
+      })
       .populate("latestMessage.sender", "name -picture -password email");
 
-    if (chat.length > 0) {
-      res.send(chat[0]);
+    if (chats.length > 0) {
+      res.send(chats[0]);
     } else {
       const newChat = new Chat({
         chatName:
@@ -61,6 +68,13 @@ const fetchAllChats = async (req, res) => {
       users: { $elemMatch: { $eq: _id } },
     })
       .populate("users", "-picture -password")
+      .populate({
+        path: "latestMessage",
+        populate: {
+          path: "sender",
+          select: "name",
+        },
+      })
       .populate("latestMessage.sender", "name -picture -password email")
       .populate("groupAdmin", "-password -picture")
       .sort({ updatedAt: "DESC" });

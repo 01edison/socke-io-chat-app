@@ -12,14 +12,15 @@ import {
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+import { Url } from "../constants";
+import { userActions } from "../store/user-slice";
+import { useDispatch } from "react-redux";
 
 const Home = () => {
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const user = JSON.parse(localStorage.getItem("user"));
-  //   if (user) navigate("/chats");
-  // }, []);
+  
   return (
     <Container maxW="xl" centerContent>
       <Box

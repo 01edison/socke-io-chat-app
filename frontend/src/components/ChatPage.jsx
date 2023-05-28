@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { userActions } from "../store/user-slice";
 import { Box } from "@chakra-ui/react";
 import SideDrawer from "./chat/SideDrawer";
 import MyChats from "./chat/MyChats";
 import ChatBox from "./chat/ChatBox";
+import { io } from "socket.io-client";
+import { Url } from "../constants";
 
 const ChatPage = () => {
-  const dispatch = useDispatch();
   const [fetchAgain, setFetchAgain] = useState(false);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(userActions.setSocket(io(Url)));
+  }, []);
 
   const {
     user: { user, token },
@@ -33,7 +39,11 @@ const ChatPage = () => {
       >
         {user && <MyChats fetchAgain={fetchAgain} />}
         {user && (
-          <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+          <ChatBox
+            fetchAgain={fetchAgain}
+            setFetchAgain={setFetchAgain}
+            // socket={socket}
+          />
         )}
       </Box>
     </div>

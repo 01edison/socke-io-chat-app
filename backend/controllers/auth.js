@@ -52,16 +52,16 @@ const login = async (req, res) => {
     form.keepExtensions = true;
 
     form.parse(req, async (err, fields, files) => {
+      
       try {
         const { email, password } = fields;
         const user = await User.findOne({ email }).select("-picture").exec();
-
+      
         if (!user) {
           throw new Error("User does not exist");
         }
 
         const isPasswordCorrect = bcrypt.compareSync(password, user.password);
-
         if (!isPasswordCorrect) {
           throw new Error("Password is not correct");
         }

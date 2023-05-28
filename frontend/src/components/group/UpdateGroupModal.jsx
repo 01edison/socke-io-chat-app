@@ -25,7 +25,7 @@ import { Url } from "../../constants";
 import axios from "axios";
 import UserListItem from "../user/UserListItem";
 
-const UpdateGroupModal = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [groupChatName, setGroupChatName] = useState();
@@ -153,7 +153,7 @@ const UpdateGroupModal = ({ fetchAgain, setFetchAgain }) => {
 
       dispatch(userActions.setCurrentChat(userToRemove == user ? "" : data));
       setFetchAgain(!fetchAgain);
-
+      fetchMessages()
       onClose();
       setLoading(false);
     } catch (error) {

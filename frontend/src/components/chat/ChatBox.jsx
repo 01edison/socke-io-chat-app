@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+
 import { Box } from "@chakra-ui/react";
 import SingleChat from "./SingleChat";
 
-const ChatBox = ({ fetchAgain, setFetchAgain }) => {
+const ChatBox = ({ fetchAgain, setFetchAgain}) => {
   const { currentChat } = useSelector((state) => state.user);
-
-  return (
+   return (
     <Box
       display={{ base: currentChat ? "flex" : "none", md: "flex" }}
       alignItems="center"
@@ -17,7 +17,10 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
       borderRadius="lg"
       borderWidth="1px"
     >
-      <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+      <SingleChat
+        fetchAgain={fetchAgain}
+        setFetchAgain={setFetchAgain}
+      />
     </Box>
   );
 };

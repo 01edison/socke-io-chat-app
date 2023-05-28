@@ -69,6 +69,7 @@ const Login = () => {
         title: error.response.data.error,
         onCloseComplete: () => setLoading(false),
         isClosable: true,
+        
       });
     }
   };

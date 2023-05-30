@@ -1,6 +1,6 @@
 import { Box, Text, IconButton, Spinner, useToast } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { userActions } from "../../store/user-slice";
 import { getSender, getSenderFull } from "../../config/chat";
@@ -15,6 +15,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [userTyping, setUserTyping] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(null);
+
+  const prevChatRef = useRef();
+
   const {
     user: { user, token },
     currentChat,
@@ -38,7 +43,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         );
         setMessages(data);
         setLoading(false);
-        // socket?.emit("join chat", currentChat._id);
       } catch (error) {
         console.log(error);
         toast({
@@ -57,23 +61,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     if (newMessage) {
       // setLoading(true);
       try {
-        socket.emit("send-message", {newMessage, chatId: currentChat._id});
-        return;
-        const body = {
+        socket.emit("send-message", {
+          newMessage,
           chatId: currentChat._id,
-          content: newMessage,
-        };
-        const { data } = await axios.post(`${Url}/api/messages`, body, {
-          headers: {
-            Authorization: "Bearer " + token,
-            "Content-Type": "application/json",
-          },
+          userId: user._id,
         });
 
-        console.log(data);
-
         setNewMessage("");
-        setMessages([...messages, data]);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -92,7 +86,25 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
-    //typing indicator logic
+    socket.emit("start-typing", {
+      chatId: currentChat._id,
+      userName: user.name,
+      userId: user._id,
+    });
+
+    // for when the user stops typing
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    setTypingTimeout(
+      setTimeout(() => {
+        // console.log("typing-stopped");
+        socket.emit("typing-stopped", {
+          chatId: currentChat._id,
+          userName: user.name,
+          userId: user._id,
+        });
+      }, 600)
+    );
   };
 
   useEffect(() => {
@@ -100,18 +112,29 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   }, [currentChat]);
 
   useEffect(() => {
-    console.log("socket do something");
-    console.log(socket);
-    console.log(currentChat);
-
     if (currentChat) {
-      socket?.emit("join-room", currentChat);
+      // Leave the previous chat room if there was one
+      if (prevChatRef.current) {
+        socket.emit("leave-chat", prevChatRef.current._id);
+      }
+
+      socket?.emit("join-chat", currentChat);
+      prevChatRef.current = currentChat;
     }
   }, [currentChat]);
 
   useEffect(() => {
     socket.on("message-from-server", (data) => {
       console.log(data);
+      setMessages((prev) => [...prev, data]);
+    });
+
+    socket.on("start-typing-server", () => {
+      setUserTyping(true);
+    });
+
+    socket.on("typing-stopped-server", () => {
+      setUserTyping(false);
     });
   }, [socket]);
 
@@ -173,7 +196,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               />
             ) : (
               <div className="messages">
-                <ScrollableChat messages={messages} />
+                <ScrollableChat messages={messages} userTyping={userTyping} />
               </div>
             )}
 

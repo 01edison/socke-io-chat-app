@@ -5,7 +5,7 @@ import { isLastMessage, isSameSender } from "../../config/chat";
 import { Avatar, Tooltip } from "@chakra-ui/react";
 import { Url } from "../../constants";
 
-const ScrollableChat = ({ messages }) => {
+const ScrollableChat = ({ messages, userTyping }) => {
   const {
     user: { user, token },
     currentChat,
@@ -19,20 +19,20 @@ const ScrollableChat = ({ messages }) => {
             style={{
               display: "flex",
               flexDirection: `${
-                message.sender._id == user._id ? "row-reverse" : "row"
+                message?.sender?._id == user._id ? "row-reverse" : "row"
               }`,
             }}
             key={i}
           >
-            {message?.sender.name !== user.name && (
+            {message?.sender?.name !== user?.name && (
               <Tooltip
-                label={message?.sender.name}
+                label={message?.sender?.name}
                 placement="bottom-start"
                 hasArrow
               >
                 <Avatar
                   src={`${Url}/api/user/image/${message?.sender?._id}`}
-                  name={message?.sender.name}
+                  name={message?.sender?.name}
                   mr={1}
                   mt={"7px"}
                   cursor="pointer"
@@ -43,7 +43,7 @@ const ScrollableChat = ({ messages }) => {
             <span
               style={{
                 backgroundColor: `${
-                  message.sender._id == user._id ? "#BEE3F8" : "#B9F5D0"
+                  message?.sender?._id == user._id ? "#BEE3F8" : "#B9F5D0"
                 }`,
                 borderRadius: "20px",
                 padding: "5px 15px",
@@ -51,11 +51,12 @@ const ScrollableChat = ({ messages }) => {
                 marginBottom: "10px",
               }}
             >
-              {message.content}
+              {message?.content}
             </span>
           </div>
         );
       })}
+      {userTyping && "typing..."}
     </ScrollableFeed>
   );
 };

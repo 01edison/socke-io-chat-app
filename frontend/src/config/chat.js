@@ -1,7 +1,7 @@
-export const getSender = (loggedUser, users) => {
+export const getSender = (loggedUser, users, id = false) => {
   const sender = users?.find((user) => user._id !== loggedUser._id);
 
-  return sender?.name;
+  return id ? sender?._id : sender?.name;
 };
 
 export const getSenderFull = (loggedUser, users) => {

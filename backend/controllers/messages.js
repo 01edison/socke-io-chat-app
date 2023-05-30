@@ -1,9 +1,9 @@
 const { Message } = require("../models/message");
 const { Chat } = require("../models/chat");
 
-const sendMessage = async (req, res) => {
+const sendMessage = async ({ newMessage: content, chatId }) => {
   try {
-    const { content, chatId } = req.body;
+    // const { content, chatId } = req.body;
 
     if (!content || !chatId) {
       throw new Error("Invalid data sent");
@@ -32,7 +32,10 @@ const sendMessage = async (req, res) => {
         await Chat.findByIdAndUpdate(chatId, {
           latestMessage: newMessage, //update the latest message of that chat anytime we create a new message
         });
-        return res.send(newMessage);
+
+
+        // return res.send(newMessage);
+
       });
     } catch (error) {
       return res.status(400).send(error.message);

@@ -8,12 +8,14 @@ import { AddIcon } from "@chakra-ui/icons";
 import { getSender } from "../../config/chat";
 import GroupChatModal from "../group/GroupChatModal";
 
-const MyChats = ({setFetchAgain, fetchAgain }) => {
+const MyChats = ({ setFetchAgain, fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState("");
+  const [typingUser, setTypingUser] = useState({});
   const {
     user: { user, token },
     currentChat,
     chats,
+    socket,
   } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
@@ -33,7 +35,16 @@ const MyChats = ({setFetchAgain, fetchAgain }) => {
   useEffect(() => {
     setLoggedUser(user);
     fetchChats();
+    socket.emit("join-user-room", { userId: user._id });
   }, [fetchAgain]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("start-typing-server", ({ userName, userId }) => {
+        console.log(userName + " is typing...");
+      });
+    }
+  }, [socket]);
   return (
     <Box
       display={{ base: currentChat ? "none" : "flex", md: "flex" }}
@@ -82,7 +93,15 @@ const MyChats = ({setFetchAgain, fetchAgain }) => {
             {chats.map((chat) => {
               return (
                 <Box
-                  onClick={() => dispatch(userActions.setCurrentChat(chat))}
+                  onClick={() => {
+                    dispatch(userActions.setCurrentChat(chat));
+                    // was trying to create a room anytime a chat was clicked on using the sender's id
+                    console.log(getSender(user, chat.users, true))
+                    // socket.emit(
+                    //   "join-user-room",
+                    //   getSender(user, chat.users, true)
+                    // );
+                  }}
                   cursor={"pointer"}
                   bg={currentChat == chat ? "#38b2ac" : "e8e8e8"}
                   color={currentChat == chat ? "white" : "black"}
